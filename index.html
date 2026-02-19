@@ -1,0 +1,76 @@
+<div id="flashcardContainer" style="border: 1px solid #ccc; padding: 20px; border-radius: 8px; text-align: center; max-width: 300px; margin: 20px auto; background-color: #f9f9f9; position: relative; overflow: hidden;">
+    <h3 style="color: #333;">Are you Happy with MARS application?</h3>
+    <div style="margin-top: 20px;">
+        <button onclick="alert('Yay! Love to Hear that!');" style="background-color: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; margin-right: 10px; position: relative; z-index: 1;">Yes</button>
+        <button id="noButton" onclick="moveButtonAway(event);" style="background-color: #f44336; color: white; padding: 10px 20px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; position: relative; z-index: 1;">No</button>
+    </div>
+</div>
+
+<script>
+    function moveButtonAway(event) {
+        const button = document.getElementById('noButton');
+        const container = document.getElementById('flashcardContainer');
+
+        if (button.style.position !== 'absolute') {
+            const rect = button.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+
+            // Calculate current position relative to the container for initial absolute positioning
+            const currentLeft = rect.left - containerRect.left;
+            const currentTop = rect.top - containerRect.top;
+
+            button.style.position = 'absolute';
+            button.style.left = `${currentLeft}px`;
+            button.style.top = `${currentTop}px`;
+            button.style.margin = '0'; // Remove default margins
+            button.style.right = 'auto'; // Clear other positioning
+            button.style.bottom = 'auto';
+            button.style.transition = 'left 0.3s ease-out, top 0.3s ease-out'; // Add transition for smooth movement
+        }
+
+        const containerWidth = container.offsetWidth;
+        const containerHeight = container.offsetHeight;
+        const buttonWidth = button.offsetWidth;
+        const buttonHeight = button.offsetHeight;
+
+        let newLeft, newTop;
+
+        // Get cursor/touch point relative to the container
+        let clientX_relative, clientY_relative;
+        if (event.clientX !== undefined) { // Mouse event
+            clientX_relative = event.clientX - container.getBoundingClientRect().left;
+            clientY_relative = event.clientY - container.getBoundingClientRect().top;
+        } else if (event.touches && event.touches.length > 0) { // Touch event
+            clientX_relative = event.touches[0].clientX - container.getBoundingClientRect().left;
+            clientY_relative = event.touches[0].clientY - container.getBoundingClientRect().top;
+        } else { // Fallback (e.g., if triggered programmatically or unknown event type)
+            clientX_relative = containerWidth / 2;
+            clientY_relative = containerHeight / 2;
+        }
+
+        // Calculate a new random position, ensuring it moves away from the cursor/touch point
+        // and stays within the container. A simple heuristic for "moving away" is implemented.
+        const padding = 10; // To keep button slightly away from edges
+
+        // Move horizontally
+        if (clientX_relative < containerWidth / 2) { // Click on left half, move to right half
+            newLeft = Math.random() * ((containerWidth / 2) - buttonWidth - padding) + (containerWidth / 2);
+        } else { // Click on right half, move to left half
+            newLeft = Math.random() * ((containerWidth / 2) - buttonWidth - padding);
+        }
+
+        // Move vertically
+        if (clientY_relative < containerHeight / 2) { // Click on top half, move to bottom half
+            newTop = Math.random() * ((containerHeight / 2) - buttonHeight - padding) + (containerHeight / 2);
+        } else { // Click on bottom half, move to left half
+            newTop = Math.random() * ((containerHeight / 2) - buttonHeight - padding);
+        }
+
+        // Ensure button is fully visible within bounds, with some padding
+        newLeft = Math.max(padding, Math.min(newLeft, containerWidth - buttonWidth - padding));
+        newTop = Math.max(padding, Math.min(newTop, containerHeight - buttonHeight - padding));
+
+        button.style.left = `${newLeft}px`;
+        button.style.top = `${newTop}px`;
+    }
+</script>
